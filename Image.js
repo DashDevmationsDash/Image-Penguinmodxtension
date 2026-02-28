@@ -21,6 +21,10 @@ Ext Done!!!!!!! yay
 */
 
 (function (Scratch) {
+  if (!Scratch.extensions.unsandboxed) {
+    throw new Error('This extension must be run unsandboxed');
+  }
+
   'use strict';
 
   let textures = Object.create(null);
@@ -144,6 +148,11 @@ Ext Done!!!!!!! yay
         color1: '#cd07f5',
         customTypes: ['dvImage'],
         blocks: [
+          {
+            opcode: 'github',
+            text: 'Open GitHub Repository',
+            blockType: Scratch.BlockType.BUTTON
+          },
           {
             opcode: 'blankImage',
             text: 'Blank [X]x[Y] Image',
@@ -545,6 +554,10 @@ Ext Done!!!!!!! yay
       const Renderer = vm.renderer;
       Target.updateAllDrawableProperties();
       delete textures[args.TARGET]
+    }
+
+    github() {
+      window.open('https://github.com/DashDevmationsDash/Image-Penguinmodxtension/tree/main');
     }
   }
 
