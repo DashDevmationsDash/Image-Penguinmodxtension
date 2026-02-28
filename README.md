@@ -19,6 +19,7 @@ Blocks:
   - [`(Get Image Of(COSTUME))`](#get-image-ofcostume--image)
 - [Pixel Manipulation](#pixel-manipulation)
   - [`(Get Color Of Pixel(VECTOR)In(IMAGE))`](#set-texture-oftexturetoimage---command)
+  - [`(Set Color Of Pixel(VECTOR)Of(IMAGE)To(COLOR))`](#set-color-of-pixelvectorofimagetocolor---image)
 
 # Image Givers
 
@@ -85,7 +86,7 @@ Gets The `(COSTUME)` As A Image
 
 Gets The Pixel On Location `(VECTOR)` In `(IMAGE)` (Top Left Is `(0,0)`)
 
-## `(Set Color Of Pixel(VECTOR)Of(IMAGE)To(COLOR)) -> Image`
+## `(Set Color Of Pixel(VECTOR)Of(IMAGE)To(COLOR))` -> Image
 ![no img?](Asset/Block/setColorOfPixel.png)
 
 Creates A New Image Thats `(IMAGE)` But The Color At Pixel `(VECTOR)` Is Set To `(COLOR)` (Same Logic As Before)
