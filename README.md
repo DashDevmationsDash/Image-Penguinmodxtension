@@ -20,74 +20,100 @@ Blocks:
 - [Pixel Manipulation](#pixel-manipulation)
   - [`(Get Color Of Pixel(VECTOR)In(IMAGE))`](#set-texture-oftexturetoimage---command)
   - [`(Set Color Of Pixel(VECTOR)Of(IMAGE)To(COLOR))`](#set-color-of-pixelvectorofimagetocolor---image)
+  - [`(Pixels Of (IMAGE))`](#pixels-ofimage---array)
+  - [`(From Pixels(ARRAY))`](#from-pixelsarray---image)
+- [Image Effects](#image-effects)
+  - [`(Invert(IMAGE))`](#invertimage---image)
+  - [`(Brighten(IMAGE)By(OFFSET))`](#brightenimagebyoffset---image)
 
 # Image Givers
 
 ## `(Blank(X)x(Y)image)` -> Image
-![no img?](Asset/Block/blankimage.png)
+![no img?](Asset/Blocks/blankimage.png)
 
 Returns A Blank Image Of Width `(X)` And Height `(Y)`
 
 ## `(Open Canvas)` -> Image
-![no img?](Asset/Block/openCanvas.png)
+![no img?](Asset/Blocks/openCanvas)
 
 Shows A Canvas That Returns Thet Painted Image In The Canvas
 
 # Image Proportions
 
 ## `(Width Of(IMAGE))` -> Number
-![no img?](Asset/Block/widthOf.png)
+![no img?](Asset/Blocks/widthOf.png)
 
 Gets The Width Of `(IMAGE)`
 
 ## `(Height Of(IMAGE))` -> Number
-![no img?](Asset/Block/heightOf.png)
+![no img?](Asset/Blocks/heightOf.png)
 
 Gets The Height Of The `(IMAGE)`
 
 # Data Urls
 
 ## `(Data URL Of(IMAGE))` -> String
-![no img?](Asset/Block/dataurl.png)
+![no img?](Asset/Blocks/dataurl.png)
 
 Gets The `(IMAGE)` As A Data URL
 
 ## `(From Data URL(URL)) -> Image`
-![no img?](Asset/Block/fromdataurl.png)
+![no img?](Asset/Blocks/fromdataurl.png)
 
 Makes A New Image From The `(URL)`
 
 # Visual
 
 ## `Set Texture Of(TARGET)To(IMAGE)` -> Command
-![no img?](Asset/Block/settextureof.png)
+![no img?](Asset/Blocks/settextureof.png)
 
 Sets The Texture Of `(TARGET)` to `(IMAGE)`
 
 ## `(Get Texture Of (TARGET))` -> Image
-![no img?](Asset/Block/textureof.png)
+![no img?](Asset/Blocks/textureof.png)
 
 Gets The Texture Of `(TARGET)` That Can Be Set By `Set Texture Of` Block
 
 ## `Remove Texture Of(TARGET)` -> Command
-![no img?](Asset/Block/removetextureof.png)
+![no img?](Asset/Blocks/removetextureof.png)
 
 Removes Any Textures Set To `(TARGET)`
 
 ## `(Get Image Of(COSTUME))` -> Image
-![no img?](Asset/Block/imgof.png)
+![no img?](Asset/Blocks/imgof.png)
 
 Gets The `(COSTUME)` As A Image
 
 # Pixel Manipulation
 
 ## `(Get Color Of Pixel(VECTOR)In(IMAGE))` -> String
-![no img?](Asset/Block/getColorOfPixel.png)
+![no img?](Asset/Blocks/getColorOfPixel.png)
 
-Gets The Pixel On Location `(VECTOR)` In `(IMAGE)` (Top Left Is `(0,0)`)
+Gets The Pixel On Location `(VECTOR)` In `(IMAGE)` (Top Left Is `(1,1)`)
 
 ## `(Set Color Of Pixel(VECTOR)Of(IMAGE)To(COLOR))` -> Image
-![no img?](Asset/Block/setColorOfPixel.png)
+![no img?](Asset/Blocks/setColorOfPixel.png)
 
 Creates A New Image Thats `(IMAGE)` But The Color At Pixel `(VECTOR)` Is Set To `(COLOR)` (Same Logic As Before)
 
+## `(Pixels Of(IMAGE))` -> Array
+![no img?](Asset/Blocks/pixels.png)
+
+Gets An Array Of All The Pixels Of `(IMAGE)`
+
+## `(From Pixels(ARRAY))` -> Image
+![no img?](Asset/Blocks/frompixels.png)
+
+Makes A New Image From Pixels `(ARRAY)`
+
+# Image Effects
+
+## `(Invert(IMAGE))` -> Image
+![no img?](Asset/Blocks/invert.png)
+
+Inverts The Colors Of `(IMAGE)`
+
+## `(Brighten(IMAGE)By(OFFSET))` -> Image
+![no img?](Asset/Blocks/brighten.png)
+
+Brightens `(IMAGE)` By `(OFFSET)` That Goes From 0-255
