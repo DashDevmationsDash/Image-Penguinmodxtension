@@ -17,6 +17,8 @@ Blocks:
   - [`(Get Texture Of[TARGET])`](#get-texture-of-targe---image)
   - [`Remove Texture Of[TARGET]`](#remove-texture-of-target---command)
   - [`(Get Image Of(COSTUME))`](#get-image-ofcostume--image)
+  - [`(Is(TARGET)Using A Texture)`](#istargetusing-a-texture---boolean)
+  - [`(Costumes Of(TARGET))`](#costumes-oftarget---array)
 - [Pixel Manipulation](#pixel-manipulation)
   - [`(Get Color Of Pixel(VECTOR)In(IMAGE))`](#set-texture-oftexturetoimage---command)
   - [`(Set Color Of Pixel(VECTOR)Of(IMAGE)To(COLOR))`](#set-color-of-pixelvectorofimagetocolor---image)
@@ -25,6 +27,11 @@ Blocks:
 - [Image Effects](#image-effects)
   - [`(Invert(IMAGE))`](#invertimage---image)
   - [`(Brighten(IMAGE)By(OFFSET))`](#brightenimagebyoffset---image)
+  - [`(Rotate(IMAGE)By(ANGLE))`](#rotateimagebyangle---image)
+  - [`(Scale(IMAGE)By(VECTOR))`](#scaleimagebyvector---image)
+  - [`(Change Transparency Of(IMAGE)By(OFFSET))`](#change-transparency-ofimagebyoffset---image)
+  - [`(Tint(IMAGE)Color(COLOR))`](#tintimsgecolorcolor---image)
+  - [`(Crop(IMAGE)At(V1)(V2))`](#cropimageatv1v2---image)
 
 # Image Givers
 
@@ -132,3 +139,22 @@ Brightens `(IMAGE)` By `(OFFSET)` That Goes From 0-255
 ![no img?](Asset/Blocks/rotate.png)
 
 It Returns A Version Of ´(IMAGE)´ Rotated ´(ANGlE)´ Degreens In Radians
+
+## `(Scale(IMAGE)By(VECTOR))` -> Image
+![no img?](Asset/Blocks/scale.png)
+
+Scales `(IMAGE)` Horizontally By `(VECTOR)`'s x Axis And Vertically By `(VECTOR)`'s y Axis
+
+## `(Change Transparency Of(IMAGE)By(OFFSET))` -> Image
+![no img?](Asset/Blocks/transparency.png)
+Changes The Transparency Of `(IMAGE)` By `(OFFSET)` That Also Goes From 0-255
+
+## `(Tint(IMAGE)Color(COLOR))` -> Image
+![no img?](Asset/Blocks/tint.png)
+
+It Returns A Version Of `(IMAGE)` That's Just Has The Color `(COLOR)`
+
+## `(Crop(IMAGE)At(V1)(V2))` -> Image
+![no img?](Asset/Blocks/crop.png)
+
+Crops `(IMAGE)` Were It Starts At `(V1)` And Ends At `(V2)` (Same Logic As In The Pixel Manipulation Blocks)
