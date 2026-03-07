@@ -79,6 +79,16 @@ Gets The Texture Of `(TARGET)` That Can Be Set By `Set Texture Of` Block
 
 Removes Any Textures Set To `(TARGET)`
 
+## `(Is(TARGET)Using A Texture)` -> Boolean
+![no img?](Asset/Blocks/isusingtexture.png)
+
+Checks If The Target `(TARGET)` Is Using A Texture Set by The `Set Texture Of` Block
+
+## `(Costumes Of(TARGET))` -> Array
+![no img?](Asset/Blocks/costumesof.png)
+
+Returns A Array Of All Costumes Of `(TARGET)` As Images
+
 ## `(Get Image Of(COSTUME))` -> Image
 ![no img?](Asset/Blocks/imgof.png)
 
@@ -117,3 +127,8 @@ Inverts The Colors Of `(IMAGE)`
 ![no img?](Asset/Blocks/brighten.png)
 
 Brightens `(IMAGE)` By `(OFFSET)` That Goes From 0-255
+
+## `(Rotate(IMAGE)By(ANGLE))` -> Image
+![no img?](Asset/Blocks/rotate.png)
+
+It Returns A Version Of ´(IMAGE)´ Rotated ´(ANGlE)´ Degreens In Radians
