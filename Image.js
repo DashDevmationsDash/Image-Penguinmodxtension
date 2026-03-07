@@ -1,25 +1,3 @@
-/*
-To Do
-
--Make Target Extension Auto Add Itself ✅
--Make Image Custom Type ✅
--Make Arguments That Accept Only One Custom Type ✅
--Make Open Canvas Block ✅
--Set Texture Of Target Block ✅
--Make Get Image Of Costume Blocks ✅
--Make More Blocks aaaasasdsamjfankdhf ✅
---Make height Of Image Block ✅
---Make From Data URL Block ✅
---Make Get Color Of Pixel Block ✅
---Make Set Color Of Pixel Block ✅
---Get Texture Of Target Block ✅
---Remove Texture From Target Block ✅
--Change A Bit The Custom Display Of The Image Type ✅
--Make Custom Display In Arrays ✅
-
-Ext Done!!!!!!! yay
-*/
-
 (function (Scratch) {
   if (!Scratch.extensions.unsandboxed) {
     throw new Error('This extension must be run unsandboxed');
@@ -104,7 +82,7 @@ Ext Done!!!!!!! yay
     }
 
     jwArrayHandler() {
-      const size = 24;
+      const size = 10;
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       canvas.width = this.x;
@@ -267,6 +245,33 @@ Ext Done!!!!!!! yay
             }
           },
           {
+            opcode: 'isusingtexture',
+            text: 'is[TARGET]using a texture',
+            blockType: Scratch.BlockType.BOOLEAN,
+            arguments: {
+              TARGET: {
+                shape: Scratch.BlockShape.OCTAGONAL,
+                check: ["Target"],
+                exemptFromNormalization: true
+              }
+            }
+          },
+          {
+            opcode: 'costumesof',
+            text: 'costumes of[TARGET]',
+            blockType: Scratch.BlockType.REPORTER,
+            blockShape: Scratch.BlockShape.SQUARE,
+            forceOutputType: 'Array',
+            disableMonitor: true,
+            arguments: {
+              TARGET: {
+                shape: Scratch.BlockShape.OCTAGONAL,
+                check: ["Target"],
+                exemptFromNormalization: true
+              }
+            }
+          },
+          {
             opcode: 'imgof',
             text: 'get image of [COSTUME]',
             blockType: Scratch.BlockType.REPORTER,
@@ -381,6 +386,108 @@ Ext Done!!!!!!! yay
               OFFSET: {
                 type: Scratch.ArgumentType.NUMBER,
                 defaultValue: 10
+              }
+            }
+          },
+          {
+            opcode: 'rotate',
+            text: 'rotate[IMAGE]by[ANGLE]',
+            blockType: Scratch.BlockType.REPORTER,
+            blockShape: Scratch.BlockShape.SCRAPPED,
+            disableMonitor: true,
+            forceOutputType: 'dvImage',
+            arguments: {
+              IMAGE: {
+                shape: Scratch.BlockShape.SCRAPPED,
+                check: ['dvImage'],
+                exemptFromNormalization: true
+              },
+              ANGLE: {
+                type: Scratch.ArgumentType.ANGLE,
+                defaultValue: 90
+              }
+            }
+          },
+          {
+            opcode: 'scale',
+            text: 'scale[IMAGE]by[VECTOR]',
+            blockType: Scratch.BlockType.REPORTER,
+            blockShape: Scratch.BlockShape.SCRAPPED,
+            disableMonitor: true,
+            forceOutputType: 'dvImage',
+            arguments: {
+              IMAGE: {
+                shape: Scratch.BlockShape.SCRAPPED,
+                check: ['dvImage'],
+                exemptFromNormalization: true
+              },
+              VECTOR: {
+                shape: Scratch.BlockShape.LEAF,
+                check: ['Vector'],
+                exemptFromNormalization: true
+              }
+            }
+          },
+          {
+            opcode: 'transparency',
+            text: 'change transparency of [IMAGE]by[OFFSET]',
+            blockType: Scratch.BlockType.REPORTER,
+            blockShape: Scratch.BlockShape.SCRAPPED,
+            disableMonitor: true,
+            forceOutputType: 'dvImage',
+            arguments: {
+              IMAGE: {
+                shape: Scratch.BlockShape.SCRAPPED,
+                check: ['dvImage'],
+                exemptFromNormalization: true
+              },
+              OFFSET: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 10
+              }
+            }
+          },
+          {
+            opcode: 'tint',
+            text: 'tint[IMAGE]color[COLOR]',
+            blockType: Scratch.BlockType.REPORTER,
+            blockShape: Scratch.BlockShape.SCRAPPED,
+            disableMonitor: true,
+            forceOutputType: 'dvImage',
+            arguments: {
+              IMAGE: {
+                shape: Scratch.BlockShape.SCRAPPED,
+                check: ['dvImage'],
+                exemptFromNormalization: true
+              },
+              COLOR: {
+                type: Scratch.ArgumentType.COLOR,
+                defaultValue: '#ff0000ff'
+              }
+            }
+          },
+          {
+            opcode: 'crop',
+            text: 'crop[IMAGE]at[V1][V2]',
+            blockType: Scratch.BlockType.REPORTER,
+            blockShape: Scratch.BlockShape.SCRAPPED,
+            disableMonitor: true,
+            forceOutputType: 'dvImage',
+            arguments: {
+              IMAGE: {
+                shape: Scratch.BlockShape.SCRAPPED,
+                check: ['dvImage'],
+                exemptFromNormalization: true
+              },
+              V1: {
+                shape: Scratch.BlockShape.LEAF,
+                check: ['Vector'],
+                exemptFromNormalization: true
+              },
+              V2: {
+                shape: Scratch.BlockShape.LEAF,
+                check: ['Vector'],
+                exemptFromNormalization: true
               }
             }
           }
@@ -677,6 +784,138 @@ Ext Done!!!!!!! yay
         Array[index] = element.array;
       }
       return new Image(Array, Array[0].length, Array.length);
+    }
+
+    rotate(args) {
+      const srcCanvas = args.IMAGE.toCanvas();
+      const angle = args.ANGLE * (Math.PI / 180);
+      const sin = Math.abs(Math.sin(angle));
+      const cos = Math.abs(Math.cos(angle));
+      const newWidth = Math.ceil(srcCanvas.width * cos + srcCanvas.height * sin);
+      const newHeight = Math.ceil(srcCanvas.width * sin + srcCanvas.height * cos);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      ctx.translate(newWidth / 2, newHeight / 2);
+      ctx.rotate(angle);
+      ctx.drawImage(srcCanvas, -srcCanvas.width / 2, -srcCanvas.height / 2);
+      const data = ctx.getImageData(0, 0, newWidth, newHeight).data;
+      const matrix = [];
+      for (let y = 0; y < newHeight; y++) {
+        const row = [];
+        for (let x = 0; x < newWidth; x++) {
+          const i = (y * newWidth + x) * 4;
+          row.push(rgbaToHex(data[i], data[i+1], data[i+2], data[i+3]));
+        }
+        matrix.push(row);
+      }
+      return new Image(matrix, newWidth, newHeight);
+    }
+
+    scale(args) {
+      const src = args.IMAGE.toCanvas()
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const vector = args.VECTOR;
+      canvas.width = vector.x * args.IMAGE.x;
+      canvas.height = vector.y * args.IMAGE.y;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(src, 0, 0, vector.x * args.IMAGE.x, vector.y * args.IMAGE.y);
+      const data = ctx.getImageData(0, 0, vector.x * args.IMAGE.x, vector.y * args.IMAGE.y).data;
+      const matrix = [];
+      for (let y = 0; y < vector.y * args.IMAGE.y; y++) {
+        const row = [];
+        for (let x = 0; x < vector.x * args.IMAGE.x; x++) {
+          const i = (y * vector.x * args.IMAGE.x + x) * 4;
+          row.push(rgbaToHex(data[i], data[i+1], data[i+2], data[i+3]));
+        }
+        matrix.push(row);
+      }
+      return new Image(matrix, canvas.width, canvas.height);
+    }
+
+    transparency(args) {
+      const Matrix = args.IMAGE.color;
+      let Return = [];
+      Matrix.forEach(row => {
+        let newRow = [];
+        row.forEach(cell => {
+          if (!cell || cell.length < 9) {
+            newRow.push("#00000000");
+            return;
+          }
+          const r = parseInt(cell.slice(1, 3), 16);
+          const g = parseInt(cell.slice(3, 5), 16);
+          const b = parseInt(cell.slice(5, 7), 16);
+          const a = Math.max(0, Math.min(255, parseInt(cell.slice(7, 9), 16) - args.OFFSET));
+          newRow.push(
+            `#${r.toString(16).padStart(2,"0")}${g.toString(16).padStart(2,"0")}${b.toString(16).padStart(2,"0")}${a.toString(16).padStart(2,"0")}`
+          );
+        });
+        Return.push(newRow);
+      });
+      return new Image(Return, args.IMAGE.x, args.IMAGE.y);
+    }
+
+    tint(args) {
+      const srcCanvas = args.IMAGE.toCanvas();
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = srcCanvas.width;
+      canvas.height = srcCanvas.height;
+      ctx.drawImage(srcCanvas, 0, 0);
+      ctx.globalCompositeOperation = "source-atop";
+      ctx.fillStyle = args.COLOR;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = "source-over";
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      const matrix = [];
+      for (let y = 0; y < canvas.height; y++) {
+       const row = [];
+       for (let x = 0; x < canvas.width; x++) {
+          const i = (y * canvas.width + x) * 4;
+          row.push(rgbaToHex(data[i], data[i+1], data[i+2], data[i+3]));
+        }
+        matrix.push(row);
+      }
+      return new Image(matrix, canvas.width, canvas.height);
+    }
+
+    isusingtexture(args) {
+      return !!textures[args.TARGET]
+    }
+    
+    crop(args) {
+      const image = args.IMAGE.color;
+      const v1 = args.V1;
+      const v2 = args.V2;
+      const x1 = Math.max(0, Math.floor(Math.min(v1.x, v2.x)) - 1);
+      const y1 = Math.max(0, Math.floor(Math.min(v1.y, v2.y)) - 1);
+      const x2 = Math.floor(Math.max(v1.x, v2.x)) - 1;
+      const y2 = Math.floor(Math.max(v1.y, v2.y)) - 1;
+      const result = [];
+      for (let y = y1; y <= y2; y++) {
+        const row = [];
+        for (let x = x1; x <= x2; x++) {
+          row.push(image[y]?.[x] ?? "#00000000");
+        }
+        result.push(row);
+      }
+      const newWidth = x2 - x1 + 1;
+      const newHeight = y2 - y1 + 1;
+      return new Image(result, newWidth, newHeight);
+    }
+
+    async costumesof(args, util) {
+      const target = args.TARGET.target;
+      const costumes = target.sprite.costumes;
+      const images = [];
+      for (const costume of costumes) {
+        const img = await this.imgof({COSTUME: costume.name}, util);
+        images.push(img);
+      }
+      return new vm.jwArray.Type(images, false);
     }
 
     github() {
