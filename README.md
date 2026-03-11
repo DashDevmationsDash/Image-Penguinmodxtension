@@ -22,6 +22,7 @@ Blocks:
 - [Pixel Manipulation](#pixel-manipulation)
   - [`(Get Color Of Pixel(VECTOR)In(IMAGE))`](#set-texture-oftexturetoimage---command)
   - [`(Set Color Of Pixel(VECTOR)Of(IMAGE)To(COLOR))`](#set-color-of-pixelvectorofimagetocolor---image)
+  - [`(Get Average Pixel Of(IMAGE))`](#get-average-pixel-ofimage---string)
   - [`(Pixels Of (IMAGE))`](#pixels-ofimage---array)
   - [`(From Pixels(ARRAY))`](#from-pixelsarray---image)
 - [Image Effects](#image-effects)
@@ -32,6 +33,11 @@ Blocks:
   - [`(Change Transparency Of(IMAGE)By(OFFSET))`](#change-transparency-ofimagebyoffset---image)
   - [`(Tint(IMAGE)Color(COLOR))`](#tintimsgecolorcolor---image)
   - [`(Crop(IMAGE)At(V1)(V2))`](#cropimageatv1v2---image)
+  - [`(Horizontally Flip(IMAGE))`](#horizontally-flipimage---image)
+  - [`(Vertically Flip(IMAGE))`](#vertically-flipimage---image)
+- [Image Mixxing](#image-mixxing)
+   - [`((A) HSV Mix (B))`](#a-hsv-mix-b---image)
+   - [`((A) RGB Mix (B))`](#a-rgb-mix-b---image)
 
 # Image Givers
 
@@ -113,6 +119,11 @@ Gets The Pixel On Location `(VECTOR)` In `(IMAGE)` (Top Left Is `(1,1)`)
 
 Creates A New Image Thats `(IMAGE)` But The Color At Pixel `(VECTOR)` Is Set To `(COLOR)` (Same Logic As Before)
 
+## `(Get Average Pixel Of(IMAGE))` -> String
+![no img?](Asset/Blocks/averagepixelcolor.png)
+
+It Gets The Average Color Of `(IMAGE)` As A Hex Color
+
 ## `(Pixels Of(IMAGE))` -> Array
 ![no img?](Asset/Blocks/pixels.png)
 
@@ -158,3 +169,25 @@ It Returns A Version Of `(IMAGE)` That's Just Has The Color `(COLOR)`
 ![no img?](Asset/Blocks/crop.png)
 
 Crops `(IMAGE)` Were It Starts At `(V1)` And Ends At `(V2)` (Same Logic As In The Pixel Manipulation Blocks)
+
+## `(Horizontally Flip(IMAGE))` -> Image
+![no img?](Asset/Blocks/horizontalyflip.png)
+
+Returns A Version Of `(IMAGE)` Horizontally Flipped
+
+## `(Vertically Flip(IMAGE))` -> Image
+![no img?](Asset/Blocks/verticalflip.png)
+
+Returns A Version Of `(IMAGE)` Vertically Flipped
+
+# Image Mixxing
+
+## `((A) HSV Mix (B))` -> Image
+![no img?](Asset/Blocks/hsvmix.png)
+
+Returns A Image Where It Gets All Pixels Of `(A)` And `(B)` And Gets The Average Of Their Hue, Saturation, And Value
+
+## `((A) RGB Mix (B))` -> Image
+![no img?](Asset/Blocks/rgbmix.png)
+
+Returns A Image Where It Gets All Pixels Of `(A)` And `(B)` And Gets The Average Of Their Red, Green, And Blue
