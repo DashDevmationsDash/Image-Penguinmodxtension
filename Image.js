@@ -116,6 +116,19 @@
       return container.outerHTML;
     }
   }
+  const Template = {
+    Block: {
+      blockType: Scratch.BlockType.REPORTER,
+      blockShape: Scratch.BlockShape.SCRAPPED,
+      forceOutputType: 'dvImage',
+      disableMonitor: true,
+    },
+    Argument: {
+      shape: Scratch.BlockShape.SCRAPPED,
+      check: ['dvImage'],
+      exemptFromNormalization: true
+    }
+  }
 
   class ImagesExtension {
     getInfo() {
@@ -134,25 +147,18 @@
           {
             opcode: 'blankImage',
             text: 'blank [X]x[Y] image',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            forceOutputType: 'dvImage',
-            disableMonitor: true,
             arguments: {
               X: { type: Scratch.ArgumentType.NUMBER, defaultValue: 3 },
               Y: { type: Scratch.ArgumentType.NUMBER, defaultValue: 3 }
-            }
+            },
+            ...Template.Block
           },
           {
             opcode: 'widthOf',
             text: 'width of [IMAGE]',
             blockType: Scratch.BlockType.REPORTER,
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ['dvImage'],
-                exemptFromNormalization: true
-              }
+              IMAGE: Template.Argument
             }
           },
           {
@@ -160,45 +166,32 @@
             text: 'height of [IMAGE]',
             blockType: Scratch.BlockType.REPORTER,
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ['dvImage'],
-                exemptFromNormalization: true
-              }
+              IMAGE: Template.Argument
             }
           },
           {
             opcode: 'openCanvas',
             text: 'open canvas',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            forceOutputType: 'dvImage',
-            disableMonitor: true
+            ...Template.Block
           },
           {
             opcode: 'dataurl',
             text: "data url of[IMAGE]",
             blockType: Scratch.BlockType.REPORTER,
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ["dvImage"],
-                exemptFromNormalization: true
-              }
+              IMAGE: Template.Argument
             }
           },
           {
             opcode: 'fromdataurl',
             text: "from data url [URL]",
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            forceOutputType: 'dvImage',
-            disableMonitor: true,
             arguments: {
               URL: {
-                type: Scratch.ArgumentType.STRING
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'https://penguinmod.com/navicon.png'
               }
-            }
+            },
+            ...Template.Block
           },
           {
             opcode: 'settextureof',
@@ -210,27 +203,20 @@
                 check: ["Target"],
                 exemptFromNormalization: true
               },
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ["dvImage"],
-                exemptFromNormalization: true
-              }
+              IMAGE: Template.Argument
             }
           },
           {
             opcode: 'textureof',
             text: 'get texture of [TARGET]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            forceOutputType: 'dvImage',
-            disableMonitor: true,
             arguments: {
               TARGET: {
                 shape: Scratch.BlockShape.OCTAGONAL,
                 check: ["Target"],
                 exemptFromNormalization: true
               }
-            }
+            },
+            ...Template.Block
           },
           {
             opcode: 'removetextureof',
@@ -274,15 +260,12 @@
           {
             opcode: 'imgof',
             text: 'get image of [COSTUME]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            forceOutputType: 'dvImage',
-            disableMonitor: true,
             arguments: {
               COSTUME: {
                 type: Scratch.ArgumentType.COSTUME
               }
-            }
+            },
+            ...Template.Block
           },
           {
             opcode: 'getColorOfPixel',
@@ -294,36 +277,33 @@
                 check: ["Vector"],
                 exemptFromNormalization: true
               },
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ["dvImage"],
-                exemptFromNormalization: true
-              }
+              IMAGE: Template.Argument
             }
           },
           {
             opcode: 'setColorOfPixel',
             text: 'set color of pixel [VECTOR] of [IMAGE] to [COLOR]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            disableMonitor: true,
-            forceOutputType: 'dvImage',
             arguments: {
               VECTOR: {
                 shape: Scratch.BlockShape.LEAF,
                 check: ["Vector"],
                 exemptFromNormalization: true
               },
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ["dvImage"],
-                exemptFromNormalization: true
-              },
+              IMAGE: Template.Argument,
               COLOR: {
                 type: Scratch.ArgumentType.COLOR,
                 defaultValue: "#ff0000"
               }
-            }
+            },
+            ...Template.Block
+          },
+          {
+            opcode: 'averagepixelcolor',
+            text: 'get average pixel of [IMAGE]',
+            blockType: Scratch.BlockType.REPORTER,
+            arguments: {
+              IMAGE: Template.Argument
+            },
           },
           {
             opcode: 'pixels',
@@ -333,152 +313,95 @@
             disableMonitor: true,
             forceOutputType: 'Array',
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ["dvImage"],
-                exemptFromNormalization: true
-              }
+              IMAGE: Template.Argument
             }
           },
           {
             opcode: 'frompixels',
             text: 'from pixels[PIXELS]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            disableMonitor: true,
-            forceOutputType: 'dvImage',
             arguments: {
               PIXELS: {
                 shape: Scratch.BlockShape.SQUARE,
                 check: ["Array"],
                 exemptFromNormalization: true
               }
-            }
+            },
+            ...Template.Block
           },
           {
             opcode: 'invert',
             text: 'invert[IMAGE]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            disableMonitor: true,
-            forceOutputType: 'dvImage',
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ['dvImage'],
-                exemptFromNormalization: true
-              }
-            }
+              IMAGE: Template.Argument
+            },
+            ...Template.Block
           },
           {
             opcode: 'brighten',
             text: 'brighten[IMAGE]by[OFFSET]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            disableMonitor: true,
-            forceOutputType: 'dvImage',
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ['dvImage'],
-                exemptFromNormalization: true
-              },
+              IMAGE: Template.Argument,
               OFFSET: {
                 type: Scratch.ArgumentType.NUMBER,
                 defaultValue: 10
               }
-            }
+            },
+            ...Template.Block
           },
           {
             opcode: 'rotate',
             text: 'rotate[IMAGE]by[ANGLE]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            disableMonitor: true,
-            forceOutputType: 'dvImage',
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ['dvImage'],
-                exemptFromNormalization: true
-              },
+              IMAGE: Template.Argument,
               ANGLE: {
                 type: Scratch.ArgumentType.ANGLE,
                 defaultValue: 90
               }
-            }
+            },
+            ...Template.Block
           },
           {
             opcode: 'scale',
             text: 'scale[IMAGE]by[VECTOR]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            disableMonitor: true,
-            forceOutputType: 'dvImage',
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ['dvImage'],
-                exemptFromNormalization: true
-              },
+              IMAGE: Template.Argument,
               VECTOR: {
                 shape: Scratch.BlockShape.LEAF,
                 check: ['Vector'],
                 exemptFromNormalization: true
               }
-            }
+            },
+            ...Template.Block
           },
           {
             opcode: 'transparency',
             text: 'change transparency of [IMAGE]by[OFFSET]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            disableMonitor: true,
-            forceOutputType: 'dvImage',
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ['dvImage'],
-                exemptFromNormalization: true
-              },
+              IMAGE: Template.Argument,
               OFFSET: {
                 type: Scratch.ArgumentType.NUMBER,
                 defaultValue: 10
               }
-            }
+            },
+            ...Template.Block
           },
           {
             opcode: 'tint',
             text: 'tint[IMAGE]color[COLOR]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            disableMonitor: true,
-            forceOutputType: 'dvImage',
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ['dvImage'],
-                exemptFromNormalization: true
-              },
+              IMAGE: Template.Argument,
               COLOR: {
                 type: Scratch.ArgumentType.COLOR,
                 defaultValue: '#ff0000ff'
               }
-            }
+            },
+            ...Template.Block
           },
           {
             opcode: 'crop',
             text: 'crop[IMAGE]at[V1][V2]',
-            blockType: Scratch.BlockType.REPORTER,
-            blockShape: Scratch.BlockShape.SCRAPPED,
-            disableMonitor: true,
-            forceOutputType: 'dvImage',
             arguments: {
-              IMAGE: {
-                shape: Scratch.BlockShape.SCRAPPED,
-                check: ['dvImage'],
-                exemptFromNormalization: true
-              },
+              IMAGE: Template.Argument,
               V1: {
                 shape: Scratch.BlockShape.LEAF,
                 check: ['Vector'],
@@ -489,7 +412,42 @@
                 check: ['Vector'],
                 exemptFromNormalization: true
               }
-            }
+            },
+            ...Template.Block
+          },
+          {
+            opcode: 'horizontalyflip',
+            text: 'horizontally flip[IMAGE]',
+            arguments: {
+              IMAGE: Template.Argument
+            },
+            ...Template.Block
+          },
+          {
+            opcode: 'verticalflip',
+            text: 'vertically flip[IMAGE]',
+            arguments: {
+              IMAGE: Template.Argument
+            },
+            ...Template.Block
+          },
+          {
+            opcode: 'hsvmix',
+            text: '[A]hsv mix[B]',
+            arguments: {
+              A: Template.Argument,
+              B: Template.Argument
+            },
+            ...Template.Block
+          },
+          {
+            opcode: 'rgbmix',
+            text: '[A]rgb mix[B]',
+            arguments: {
+              A: Template.Argument,
+              B: Template.Argument
+            },
+            ...Template.Block
           }
         ]
       };
@@ -511,7 +469,7 @@
     }
 
     heightOf(args) {
-      return args.IMAGE.y
+      return args.IMAGE?.y || 0;
     }
 
     async openCanvas() {
@@ -636,6 +594,7 @@
       return args.IMAGE.toCanvas().toDataURL();
     }
     settextureof(args) {
+      if (!args.TARGET || !args.IMAGE) return
       const Target = args.TARGET.target;
       const Renderer = vm.renderer;
       const skinId = Renderer.createBitmapSkin(args.IMAGE.toCanvas());
@@ -644,7 +603,17 @@
     }
     async imgof(args, util) {
       const Target = util.target;
-      const Index = Target.getCostumeIndexByName(args.COSTUME);
+      let Index;
+      if (args.COSTUME === 'next costume') {
+        Index = (Target.currentCostume + 1) % Target.sprite.costumes.length;
+      } else if (args.COSTUME === 'previous costume') {
+        Index = (Target.currentCostume - 1 + Target.sprite.costumes.length) % Target.sprite.costumes.length;
+      } else if (args.COSTUME === 'random costume') {
+        Index = Math.floor(Math.random() * Target.sprite.costumes.length);
+      } else {
+        Index = Target.getCostumeIndexByName(args.COSTUME);
+        if (Index < 0) return this.blankImage({X: 3, Y:3})
+      }
       const Costume = Target.sprite.costumes[Index];
       const Img =  document.createElement('img');
       Img.src = Costume.asset.encodeDataURI();
@@ -672,45 +641,49 @@
     }
 
     async fromdataurl(args) {
-      const Img = document.createElement('img');
-      Img.crossOrigin = "anonymous";
-      Img.src = args.URL;
-      await new Promise((resolve, reject) => {
-        Img.onload = resolve;
-        Img.onerror = reject;
-      });
-      const Canvas = document.createElement('canvas');
-      const Context = Canvas.getContext('2d');
-      Canvas.width = Img.width;
-      Canvas.height = Img.height;
-      Context.drawImage(Img, 0, 0);
-      const ImageData = Context.getImageData(0, 0, Canvas.width, Canvas.height).data;
-      const Matrix = [];
-      for (let y = 0; y < Canvas.height; y++) {
-        const Row = [];
-        for (let x = 0; x < Canvas.width; x++) {
-          const i = (y * Canvas.width + x) * 4;
-          const r = ImageData[i].toString(16).padStart(2, '0');
-          const g = ImageData[i + 1].toString(16).padStart(2, '0');
-          const b = ImageData[i + 2].toString(16).padStart(2, '0');
-          const a = ImageData[i + 3].toString(16).padStart(2, '0');
-          Row.push(`#${r}${g}${b}${a}`)
+      try {
+        const Img = document.createElement('img');
+        Img.crossOrigin = "anonymous";
+        Img.src = args.URL;
+        await new Promise((resolve, reject) => {
+          Img.onload = resolve;
+          Img.onerror = reject;
+        });
+        const Canvas = document.createElement('canvas');
+        const Context = Canvas.getContext('2d');
+        Canvas.width = Img.width;
+        Canvas.height = Img.height;
+        Context.drawImage(Img, 0, 0);
+        const ImageData = Context.getImageData(0, 0, Canvas.width, Canvas.height).data;
+        const Matrix = [];
+        for (let y = 0; y < Canvas.height; y++) {
+          const Row = [];
+          for (let x = 0; x < Canvas.width; x++) {
+            const i = (y * Canvas.width + x) * 4;
+            const r = ImageData[i].toString(16).padStart(2, '0');
+            const g = ImageData[i + 1].toString(16).padStart(2, '0');
+            const b = ImageData[i + 2].toString(16).padStart(2, '0');
+            const a = ImageData[i + 3].toString(16).padStart(2, '0');
+            Row.push(`#${r}${g}${b}${a}`)
+          }
+          Matrix.push(Row);
         }
-        Matrix.push(Row);
+        return new Image(Matrix, Canvas.width, Canvas.height);
+      } catch(e) {
+        return this.blankImage({X: 3, Y: 3})
       }
-      return new Image(Matrix, Canvas.width, Canvas.height);
     }
 
     getColorOfPixel(args) {
-      const x = Math.floor(args.VECTOR.x);
-      const y = Math.floor(args.VECTOR.y);
+      const x = Math.max(1, Math.floor(args.VECTOR.x));
+      const y = Math.max(1, Math.floor(args.VECTOR.y));
       const Matrix = args.IMAGE.color;
       return Matrix[y - 1][x - 1];
     }
 
     setColorOfPixel(args) {
-      const x = Math.floor(args.VECTOR.x);
-      const y = Math.floor(args.VECTOR.y);
+      const x = Math.max(1, Math.floor(args.VECTOR.x));
+      const y = Math.max(1, Math.floor(args.VECTOR.y));
       const Matrix = args.IMAGE.color;
       Matrix[y - 1][x - 1] = args.COLOR + "ff";
       return new Image(Matrix, args.IMAGE.x, args.IMAGE.y);
@@ -721,6 +694,7 @@
     }
 
     removetextureof(args) {
+      if(!args.TARGET) return
       const Target = args.TARGET.target;
       const Renderer = vm.renderer;
       Target.updateAllDrawableProperties();
@@ -728,6 +702,7 @@
     }
 
     invert(args) {
+      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
       const Matrix = args.IMAGE.color;
       let Return = [];
       Matrix.forEach(row => {
@@ -751,6 +726,8 @@
     }
 
     brighten(args) {
+      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
+      const Offset = Math.abs(Math.floor(args.OFFSET))
       const Matrix = args.IMAGE.color;
       let Return = [];
       Matrix.forEach(row => {
@@ -760,9 +737,9 @@
             newRow.push("#00000000");
             return;
           }
-          const r = Math.min(parseInt(cell.slice(1, 3), 16) + args.OFFSET, 255);
-          const g = Math.min(parseInt(cell.slice(3, 5), 16) + args.OFFSET, 255);
-          const b = Math.min(parseInt(cell.slice(5, 7), 16) + args.OFFSET, 255);
+          const r = Math.min(parseInt(cell.slice(1, 3), 16) + Offset, 255);
+          const g = Math.min(parseInt(cell.slice(3, 5), 16) + Offset, 255);
+          const b = Math.min(parseInt(cell.slice(5, 7), 16) + Offset, 255);
           const a = cell.slice(7, 9);
           newRow.push(
             `#${r.toString(16).padStart(2,"0")}${g.toString(16).padStart(2,"0")}${b.toString(16).padStart(2,"0")}${a}`
@@ -774,11 +751,13 @@
     }
 
     pixels(args) {
+      if (!args.IMAGE || !args.IMAGE.customId) return new vm.jwArray.Type([], false)
       return new vm.jwArray.Type(args.IMAGE.color, false);
     }
 
     frompixels(args) {
       const Array = args.PIXELS.array;
+      if (!args.PIXELS) return this.blankImage({X: 3,Y: 3})
       for (let index = 0; index < Array.length; index++) {
         const element = Array[index];
         Array[index] = element.array;
@@ -787,6 +766,7 @@
     }
 
     rotate(args) {
+      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
       const srcCanvas = args.IMAGE.toCanvas();
       const angle = args.ANGLE * (Math.PI / 180);
       const sin = Math.abs(Math.sin(angle));
@@ -814,10 +794,13 @@
     }
 
     scale(args) {
+      if (!args.IMAGE || !args.IMAGE.customId || !args.VECTOR) return this.blankImage({X: 3,Y: 3})
       const src = args.IMAGE.toCanvas()
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const vector = args.VECTOR;
+      vector.x = Math.max(1, Math.floor(vector.x));
+      vector.y = Math.max(1, Math.floor(vector.y));
       canvas.width = vector.x * args.IMAGE.x;
       canvas.height = vector.y * args.IMAGE.y;
       ctx.imageSmoothingEnabled = false;
@@ -836,6 +819,7 @@
     }
 
     transparency(args) {
+      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
       const Matrix = args.IMAGE.color;
       let Return = [];
       Matrix.forEach(row => {
@@ -859,7 +843,7 @@
     }
 
     tint(args) {
-      const srcCanvas = args.IMAGE.toCanvas();
+      const srcCanvas = args.IMAGE?.toCanvas() || document.createElement('canvas');
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       canvas.width = srcCanvas.width;
@@ -883,7 +867,7 @@
     }
 
     isusingtexture(args) {
-      return !!textures[args.TARGET]
+      return !!(textures[args.TARGET] || false)
     }
     
     crop(args) {
@@ -916,6 +900,185 @@
         images.push(img);
       }
       return new vm.jwArray.Type(images, false);
+    }
+
+    horizontalyflip(args) {
+      const matrix = args.IMAGE.color;
+      let retrun = [];
+      matrix.forEach(element => {
+        retrun.push(element.reverse());
+      });
+      return new Image(retrun, args.IMAGE.x, args.IMAGE.y);
+    }
+
+    verticalflip(args) {
+      let matrix = args.IMAGE;
+      matrix.color = matrix.color.reverse();
+      return matrix;
+    }
+    
+    hsvmix(args) {
+      const A = args.A;
+      const B = args.B;
+      const width = Math.min(A.x, B.x);
+      const height = Math.min(A.y, B.y);
+      function hexToRgb(hex) {
+        hex = hex.replace("#", "");
+        return {
+          r: parseInt(hex.substring(0,2),16),
+          g: parseInt(hex.substring(2,4),16),
+          b: parseInt(hex.substring(4,6),16),
+          a: parseInt(hex.substring(6,8) || "ff",16)
+        };
+      }
+      function rgbToHex(r,g,b,a){
+       return "#" +
+        r.toString(16).padStart(2,"0") +
+        g.toString(16).padStart(2,"0") +
+        b.toString(16).padStart(2,"0") +
+        a.toString(16).padStart(2,"0");
+      }
+      function rgbToHsv(r,g,b){
+        r/=255; g/=255; b/=255;
+        let max=Math.max(r,g,b);
+        let min=Math.min(r,g,b);
+        let d=max-min;
+        let h=0;
+        if(d!==0){
+          if(max===r) h=((g-b)/d)%6;
+          else if(max===g) h=(b-r)/d+2;
+          else h=(r-g)/d+4;
+        }
+        h=Math.round(h*60);
+        if(h<0) h+=360;
+        let s=max===0?0:d/max;
+        let v=max;
+        return {h,s,v};
+      }
+      function hsvToRgb(h,s,v){
+        let c=v*s;
+        let x=c*(1-Math.abs((h/60)%2-1));
+        let m=v-c;
+        let r=0,g=0,b=0;
+        if(h<60){r=c;g=x;b=0}
+        else if(h<120){r=x;g=c;b=0}
+        else if(h<180){r=0;g=c;b=x}
+        else if(h<240){r=0;g=x;b=c}
+        else if(h<300){r=x;g=0;b=c}
+        else{r=c;g=0;b=x}
+        return {
+          r:Math.round((r+m)*255),
+          g:Math.round((g+m)*255),
+          b:Math.round((b+m)*255)
+        }
+      }
+      const result = [];
+      for(let y=0;y<height;y++){
+        const row=[];
+        for(let x=0;x<width;x++){
+          const aPixel = hexToRgb(A.color[y][x]);
+          const bPixel = hexToRgb(B.color[y][x]);
+          if (aPixel.a === 0 || bPixel.a === 0) {
+            row.push('#00000000');
+            continue
+          }
+          const hsvA = rgbToHsv(aPixel.r,aPixel.g,aPixel.b);
+          const hsvB = rgbToHsv(bPixel.r,bPixel.g,bPixel.b);
+          const rgb = hsvToRgb(hsvA.h, hsvB.s, hsvB.v);
+          row.push(rgbToHex(rgb.r,rgb.g,rgb.b,aPixel.a));
+        }
+        result.push(row);
+      }
+      return new Image(result,width,height);
+    }
+
+    rgbmix(args) {
+      const A = args.A;
+      const B = args.B;
+      const width = Math.min(A.x, B.x);
+      const height = Math.min(A.y, B.y);
+      function hexToRgb(hex) {
+        hex = hex.replace("#", "");
+        return {
+          r: parseInt(hex.substring(0,2),16),
+          g: parseInt(hex.substring(2,4),16),
+          b: parseInt(hex.substring(4,6),16),
+          a: parseInt(hex.substring(6,8) || "ff",16)
+        };
+      }
+      function rgbToHex(r,g,b,a){
+       return "#" +
+        r.toString(16).padStart(2,"0") +
+        g.toString(16).padStart(2,"0") +
+        b.toString(16).padStart(2,"0") +
+        a.toString(16).padStart(2,"0");
+      }
+      function rgbToHsv(r,g,b){
+        r/=255; g/=255; b/=255;
+        let max=Math.max(r,g,b);
+        let min=Math.min(r,g,b);
+        let d=max-min;
+        let h=0;
+        if(d!==0){
+          if(max===r) h=((g-b)/d)%6;
+          else if(max===g) h=(b-r)/d+2;
+          else h=(r-g)/d+4;
+        }
+        h=Math.round(h*60);
+        if(h<0) h+=360;
+        let s=max===0?0:d/max;
+        let v=max;
+        return {h,s,v};
+      }
+      const result = [];
+      for(let y=0;y<height;y++){
+        const row=[];
+        for(let x=0;x<width;x++){
+          const aPixel = hexToRgb(A.color[y][x]);
+          const bPixel = hexToRgb(B.color[y][x]);
+          if (aPixel.a === 0 || bPixel.a === 0) {
+            row.push('#00000000');
+            continue
+          }
+          const pixel = rgbToHex((aPixel.r + bPixel.r) / 2, (aPixel.g + bPixel.g) / 2, (aPixel.b + bPixel.b) / 2, (aPixel.a + bPixel.a) / 2)
+          row.push(pixel);
+        }
+        result.push(row);
+      }
+      return new Image(result,width,height);
+    }
+
+    averagepixelcolor(args) {
+      let rTotal = 0;
+      let gTotal = 0;
+      let bTotal = 0;
+      let aTotal = 0;
+      let count = 0;
+      const matrix = args.IMAGE.color;
+      matrix.forEach(row => {
+        row.forEach(cell => {
+          if (!cell || cell.length < 9) return;
+          const r = parseInt(cell.slice(1, 3), 16);
+          const g = parseInt(cell.slice(3, 5), 16);
+          const b = parseInt(cell.slice(5, 7), 16);
+          const a = parseInt(cell.slice(7, 9), 16);
+          rTotal += r;
+          gTotal += g;
+          bTotal += b;
+          aTotal += a;
+          count++;
+        });
+      });
+      if (count === 0) return "#00000000";
+      const r = Math.round(rTotal / count);
+      const g = Math.round(gTotal / count);
+      const b = Math.round(bTotal / count);
+      const a = Math.round(aTotal / count);
+      return "#" +
+        r.toString(16).padStart(2,"0") +
+        g.toString(16).padStart(2,"0") +
+        b.toString(16).padStart(2,"0") +
+        a.toString(16).padStart(2,"0");
     }
 
     github() {
