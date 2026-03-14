@@ -36,8 +36,8 @@ Blocks:
   - [`(Horizontally Flip(IMAGE))`](#horizontally-flipimage---image)
   - [`(Vertically Flip(IMAGE))`](#vertically-flipimage---image)
 - [Image Mixxing](#image-mixxing)
-   - [`((A) HSV Mix (B))`](#a-hsv-mix-b---image)
-   - [`((A) RGB Mix (B))`](#a-rgb-mix-b---image)
+   - [`((A) HSV[MENU]Mix (B))`](#a-hsv-mix-b---image)
+   - [`((A) RGB[MENU]Mix (B))`](#a-rgb-mix-b---image)
 
 # Image Givers
 
@@ -185,9 +185,9 @@ Returns A Version Of `(IMAGE)` Vertically Flipped
 ## `((A) HSV Mix (B))` -> Image
 ![no img?](Asset/Blocks/hsvmix.png)
 
-Returns A Image Where It Gets All Pixels Of `(A)` And `(B)` And Gets The Average Of Their Hue, Saturation, And Value
+Returns A Image Where It Gets All Pixels Of `(A)` And `(B)` And Executes The Function In `[MENU]` To All Their Hue, Saturation, And Value
 
 ## `((A) RGB Mix (B))` -> Image
 ![no img?](Asset/Blocks/rgbmix.png)
 
-Returns A Image Where It Gets All Pixels Of `(A)` And `(B)` And Gets The Average Of Their Red, Green, And Blue
+Returns A Image Where It Gets All Pixels Of `(A)` And `(B)` And Executes The Function In `[MENU]` To All Their Red, Green, And Blue
