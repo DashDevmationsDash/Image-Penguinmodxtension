@@ -127,7 +127,8 @@
       shape: Scratch.BlockShape.SCRAPPED,
       check: ['dvImage'],
       exemptFromNormalization: true
-    }
+    },
+    Pause: "---"
   }
 
   class ImagesExtension {
@@ -154,6 +155,12 @@
             ...Template.Block
           },
           {
+            opcode: 'openCanvas',
+            text: 'open canvas',
+            ...Template.Block
+          },
+          Template.Pause,
+          {
             opcode: 'widthOf',
             text: 'width of [IMAGE]',
             blockType: Scratch.BlockType.REPORTER,
@@ -169,11 +176,7 @@
               IMAGE: Template.Argument
             }
           },
-          {
-            opcode: 'openCanvas',
-            text: 'open canvas',
-            ...Template.Block
-          },
+          Template.Pause,
           {
             opcode: 'dataurl',
             text: "data url of[IMAGE]",
@@ -193,6 +196,7 @@
             },
             ...Template.Block
           },
+          Template.Pause,
           {
             opcode: 'settextureof',
             text: 'set texture of [TARGET] to [IMAGE]',
@@ -267,6 +271,7 @@
             },
             ...Template.Block
           },
+          Template.Pause,
           {
             opcode: 'getColorOfPixel',
             text: 'get color of pixel [VECTOR] of [IMAGE]',
@@ -328,6 +333,7 @@
             },
             ...Template.Block
           },
+          Template.Pause,
           {
             opcode: 'invert',
             text: 'invert[IMAGE]',
@@ -431,36 +437,125 @@
             },
             ...Template.Block
           },
+          Template.Pause,
           {
-            opcode: 'hsvmix',
-            text: '[A]hsv mix[B]',
+            opcode: 'rgbmix',
+            text: '[A]rgb[MENU]mix[B]',
             arguments: {
               A: Template.Argument,
-              B: Template.Argument
+              B: Template.Argument,
+              MENU: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'BlendTypes'
+              }
             },
             ...Template.Block
           },
           {
-            opcode: 'rgbmix',
-            text: '[A]rgb mix[B]',
+            opcode: 'hsvmix',
+            text: '[A]hsv[MENU]mix[B]',
             arguments: {
               A: Template.Argument,
-              B: Template.Argument
+              B: Template.Argument,
+              MENU: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'BlendTypes'
+              }
+            },
+            ...Template.Block
+          },
+          Template.Pause,
+          {
+            opcode: 'lineargradient',
+            text: 'linear gradient that goes from[A]to[B]',
+            arguments: {
+              A: {
+                type: Scratch.ArgumentType.COLOR,
+                defaultValue: '#ff0000'
+              },
+              B: {
+                type: Scratch.ArgumentType.COLOR,
+                defaultValue: '#0000ff'
+              }
+            },
+            ...Template.Block
+          },
+          {
+            opcode: 'circlegradient',
+            text: 'circular gradient that goes from[A]to[B]with radius[R]',
+            arguments: {
+              A: {
+                type: Scratch.ArgumentType.COLOR,
+                defaultValue: '#ff0000'
+              },
+              B: {
+                type: Scratch.ArgumentType.COLOR,
+                defaultValue: '#0000ff'
+              },
+              R: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 50
+              }
             },
             ...Template.Block
           }
-        ]
+        ],
+        menus: {
+          BlendTypes: {
+            acceptReporters: false,
+            items: [
+              {
+                text: 'add',
+                value: 'add'
+              },
+              {
+                text: 'subtract',
+                value: 'sub'
+              },
+              {
+                text: 'average',
+                value: 'avg'
+              },
+              {
+                text: 'multiply',
+                value: 'mul'
+              },
+              {
+                text: 'divide',
+                value: 'div'
+              },
+              {
+                text: 'add alpha',
+                value: 'addA'
+              },
+              {
+                text: 'subtract alpha',
+                value: 'subA'
+              },
+              {
+                text: 'multiply alpha',
+                value: 'mulA'
+              },
+              {
+                text: 'divide alpha',
+                value: 'divA'
+              },
+              {
+                text: 'alpha composite',
+                value: 'alpha'
+              }
+            ]
+          }
+        }
       };
     }
 
     blankImage(args) {
       const width = Math.max(1, Math.floor(args.X));
       const height = Math.max(1, Math.floor(args.Y));
-
       const matrix = Array.from({ length: height }, () =>
         new Array(width).fill("#00000000")
       );
-
       return new Image(matrix, width, height);
     }
 
@@ -483,19 +578,15 @@
           justifyContent: "center",
           zIndex: 9999
         });
-
         const container = createElement("div", {
           background: "#fff",
           padding: "10px",
           borderRadius: "6px",
           fontFamily: "sans-serif"
         });
-
         overlay.appendChild(container);
-
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-
         canvas.width = 32;
         canvas.height = 32;
         Object.assign(canvas.style, {
@@ -504,38 +595,30 @@
           border: "2px solid black",
           imageRendering: "pixelated"
         });
-
         const colorInput = document.createElement("input");
         colorInput.type = "color";
         colorInput.value = "#577bfb";
-
         const widthInput = document.createElement("input");
         widthInput.type = "number";
         widthInput.value = 32;
         widthInput.min = 1;
         widthInput.max = 256;
-
         const heightInput = document.createElement("input");
         heightInput.type = "number";
         heightInput.value = 32;
         heightInput.min = 1;
         heightInput.max = 256;
-
         widthInput.oninput = () => canvas.width = Math.floor(widthInput.value);
         heightInput.oninput = () => canvas.height = Math.floor(heightInput.value);
         let drawing = false;
         let erase = false;
-
         canvas.addEventListener("contextmenu", e => e.preventDefault());
-
         function paint(e) {
           const rect = canvas.getBoundingClientRect();
           const scaleX = canvas.width / rect.width;
           const scaleY = canvas.height / rect.height;
-
           const x = Math.floor((e.clientX - rect.left) * scaleX);
           const y = Math.floor((e.clientY - rect.top) * scaleY);
-
           if (erase) {
             ctx.clearRect(x, y, 1, 1);
           } else {
@@ -543,17 +626,14 @@
             ctx.fillRect(x, y, 1, 1);
           }
         }
-
         canvas.addEventListener("mousedown", e => {
           drawing = true;
           erase = (e.button === 2);
           paint(e);
         });
-
         canvas.addEventListener("mousemove", e => {
           if (drawing) paint(e);
         });
-
         window.addEventListener("mouseup", () => drawing = false);
         const ok = document.createElement("button");
         ok.textContent = "OK";
@@ -570,12 +650,10 @@
           document.createElement("br"),
           ok
         );
-
         document.body.appendChild(overlay);
         ok.onclick = () => {
           const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
           const matrix = [];
-
           for (let y = 0; y < canvas.height; y++) {
             const row = [];
             for (let x = 0; x < canvas.width; x++) {
@@ -584,17 +662,20 @@
             }
             matrix.push(row);
           }
-
           document.body.removeChild(overlay);
           resolve(new Image(matrix, canvas.width, canvas.height));
         };
       });
     }
     dataurl(args) {
-      return args.IMAGE.toCanvas().toDataURL();
+      try {
+        return args.IMAGE.toCanvas().toDataURL();
+      } catch(e) {
+        return ''
+      }
     }
     settextureof(args) {
-      if (!args.TARGET || !args.IMAGE) return
+      if (args.TARGET === undefined || args.IMAGE === undefined) return
       const Target = args.TARGET.target;
       const Renderer = vm.renderer;
       const skinId = Renderer.createBitmapSkin(args.IMAGE.toCanvas());
@@ -610,6 +691,8 @@
         Index = (Target.currentCostume - 1 + Target.sprite.costumes.length) % Target.sprite.costumes.length;
       } else if (args.COSTUME === 'random costume') {
         Index = Math.floor(Math.random() * Target.sprite.costumes.length);
+      } else if (typeof args.COSTUME == 'number') {
+        Index = (args.COSTUME - 1) % Target.sprite.costumes.length;
       } else {
         Index = Target.getCostumeIndexByName(args.COSTUME);
         if (Index < 0) return this.blankImage({X: 3, Y:3})
@@ -675,6 +758,12 @@
     }
 
     getColorOfPixel(args) {
+      if (args.VECTOR == undefined) return '#00000000'
+      if (args.VECTOR.x == undefined) return '#00000000'
+      if (args.VECTOR.y == undefined) return '#00000000'
+      if (args.IMAGE == undefined) return '#00000000'
+      if (args.VECTOR.x > args.IMAGE.x) return '#00000000'
+      if (args.VECTOR.y > args.IMAGE.y) return '#00000000'
       const x = Math.max(1, Math.floor(args.VECTOR.x));
       const y = Math.max(1, Math.floor(args.VECTOR.y));
       const Matrix = args.IMAGE.color;
@@ -682,6 +771,12 @@
     }
 
     setColorOfPixel(args) {
+      if (args.VECTOR == undefined) return args.IMAGE;
+      if (args.VECTOR.x == undefined) return args.IMAGE;
+      if (args.VECTOR.y == undefined) return args.IMAGE;
+      if (args.IMAGE == undefined) return this.blankImage({X: 3, Y: 3});
+      if (args.VECTOR.x > args.IMAGE.x) return args.IMAGE;
+      if (args.VECTOR.y > args.IMAGE.y) return args.IMAGE;
       const x = Math.max(1, Math.floor(args.VECTOR.x));
       const y = Math.max(1, Math.floor(args.VECTOR.y));
       const Matrix = args.IMAGE.color;
@@ -690,6 +785,7 @@
     }
 
     textureof(args) {
+      if (!this.isusingtexture(args) || args.TARGET == undefined) return this.blankImage({X: 3, Y: 3})
       return textures[args.TARGET];
     }
 
@@ -698,11 +794,11 @@
       const Target = args.TARGET.target;
       const Renderer = vm.renderer;
       Target.updateAllDrawableProperties();
-      delete textures[args.TARGET]
+      if (!! this.isusingtexture(args)) delete textures[args.TARGET]
     }
 
     invert(args) {
-      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
+      if (args.IMAGE == undefined || args.IMAGE.customId != 'dvImage') return this.blankImage({X: 3,Y: 3})
       const Matrix = args.IMAGE.color;
       let Return = [];
       Matrix.forEach(row => {
@@ -799,8 +895,8 @@
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const vector = args.VECTOR;
-      vector.x = Math.max(1, Math.floor(vector.x));
-      vector.y = Math.max(1, Math.floor(vector.y));
+      vector.x = Math.max(1, vector.x);
+      vector.y = Math.max(1, vector.y);
       canvas.width = vector.x * args.IMAGE.x;
       canvas.height = vector.y * args.IMAGE.y;
       ctx.imageSmoothingEnabled = false;
@@ -843,6 +939,7 @@
     }
 
     tint(args) {
+      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
       const srcCanvas = args.IMAGE?.toCanvas() || document.createElement('canvas');
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -871,6 +968,7 @@
     }
     
     crop(args) {
+      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
       const image = args.IMAGE.color;
       const v1 = args.V1;
       const v2 = args.V2;
@@ -891,18 +989,19 @@
       return new Image(result, newWidth, newHeight);
     }
 
-    async costumesof(args, util) {
+    async costumesof(args) {
+      if (args.TARGET == undefined) return new vm.jwArray.Type([], false);
       const target = args.TARGET.target;
       const costumes = target.sprite.costumes;
       const images = [];
-      for (const costume of costumes) {
-        const img = await this.imgof({COSTUME: costume.name}, util);
-        images.push(img);
+      for (const element of costumes) {
+        images.push(await this.fromdataurl({URL: element.asset.encodeDataURI()}));
       }
       return new vm.jwArray.Type(images, false);
     }
 
     horizontalyflip(args) {
+      if (args.IMAGE == undefined) return this.blankImage({X: 3, Y: 3})
       const matrix = args.IMAGE.color;
       let retrun = [];
       matrix.forEach(element => {
@@ -912,91 +1011,22 @@
     }
 
     verticalflip(args) {
-      let matrix = args.IMAGE;
-      matrix.color = matrix.color.reverse();
+      if (args.IMAGE == undefined) return this.blankImage({X: 3, Y: 3})
+      let matrix = args.IMAGE.color;
+      matrix.color = matrix.reverse();
       return matrix;
     }
-    
-    hsvmix(args) {
-      const A = args.A;
-      const B = args.B;
-      const width = Math.min(A.x, B.x);
-      const height = Math.min(A.y, B.y);
-      function hexToRgb(hex) {
-        hex = hex.replace("#", "");
-        return {
-          r: parseInt(hex.substring(0,2),16),
-          g: parseInt(hex.substring(2,4),16),
-          b: parseInt(hex.substring(4,6),16),
-          a: parseInt(hex.substring(6,8) || "ff",16)
-        };
-      }
-      function rgbToHex(r,g,b,a){
-       return "#" +
-        r.toString(16).padStart(2,"0") +
-        g.toString(16).padStart(2,"0") +
-        b.toString(16).padStart(2,"0") +
-        a.toString(16).padStart(2,"0");
-      }
-      function rgbToHsv(r,g,b){
-        r/=255; g/=255; b/=255;
-        let max=Math.max(r,g,b);
-        let min=Math.min(r,g,b);
-        let d=max-min;
-        let h=0;
-        if(d!==0){
-          if(max===r) h=((g-b)/d)%6;
-          else if(max===g) h=(b-r)/d+2;
-          else h=(r-g)/d+4;
-        }
-        h=Math.round(h*60);
-        if(h<0) h+=360;
-        let s=max===0?0:d/max;
-        let v=max;
-        return {h,s,v};
-      }
-      function hsvToRgb(h,s,v){
-        let c=v*s;
-        let x=c*(1-Math.abs((h/60)%2-1));
-        let m=v-c;
-        let r=0,g=0,b=0;
-        if(h<60){r=c;g=x;b=0}
-        else if(h<120){r=x;g=c;b=0}
-        else if(h<180){r=0;g=c;b=x}
-        else if(h<240){r=0;g=x;b=c}
-        else if(h<300){r=x;g=0;b=c}
-        else{r=c;g=0;b=x}
-        return {
-          r:Math.round((r+m)*255),
-          g:Math.round((g+m)*255),
-          b:Math.round((b+m)*255)
-        }
-      }
-      const result = [];
-      for(let y=0;y<height;y++){
-        const row=[];
-        for(let x=0;x<width;x++){
-          const aPixel = hexToRgb(A.color[y][x]);
-          const bPixel = hexToRgb(B.color[y][x]);
-          if (aPixel.a === 0 || bPixel.a === 0) {
-            row.push('#00000000');
-            continue
-          }
-          const hsvA = rgbToHsv(aPixel.r,aPixel.g,aPixel.b);
-          const hsvB = rgbToHsv(bPixel.r,bPixel.g,bPixel.b);
-          const rgb = hsvToRgb(hsvA.h, hsvB.s, hsvB.v);
-          row.push(rgbToHex(rgb.r,rgb.g,rgb.b,aPixel.a));
-        }
-        result.push(row);
-      }
-      return new Image(result,width,height);
-    }
+
 
     rgbmix(args) {
       const A = args.A;
       const B = args.B;
+      if (A == undefined || B == undefined) return this.blankImage({X: 3, Y: 3});
       const width = Math.min(A.x, B.x);
       const height = Math.min(A.y, B.y);
+      function clamp(v) {
+        return Math.max(0, Math.min(Math.round(v), 255));
+      }
       function hexToRgb(hex) {
         hex = hex.replace("#", "");
         return {
@@ -1007,28 +1037,39 @@
         };
       }
       function rgbToHex(r,g,b,a){
-       return "#" +
-        r.toString(16).padStart(2,"0") +
-        g.toString(16).padStart(2,"0") +
-        b.toString(16).padStart(2,"0") +
-        a.toString(16).padStart(2,"0");
+        return "#" +
+          clamp(r).toString(16).padStart(2,"0") +
+          clamp(g).toString(16).padStart(2,"0") +
+          clamp(b).toString(16).padStart(2,"0") +
+          clamp(a).toString(16).padStart(2,"0");
       }
-      function rgbToHsv(r,g,b){
-        r/=255; g/=255; b/=255;
-        let max=Math.max(r,g,b);
-        let min=Math.min(r,g,b);
-        let d=max-min;
-        let h=0;
-        if(d!==0){
-          if(max===r) h=((g-b)/d)%6;
-          else if(max===g) h=(b-r)/d+2;
-          else h=(r-g)/d+4;
+      const conversiontypes = {
+        add: (A,B)=>A+B,
+        sub: (A,B)=>A-B,
+        mul: (A,B)=>A*B/255,
+        div: (A,B)=>B===0?0:(A/B)*255,
+        avg: (A,B)=>(A+B)/2,
+        addA: (A,B,aA,aB)=>A*(aA/255)+B*(aB/255),
+        subA: (A,B,aA,aB)=>A*(aA/255)-B*(aB/255),
+        mulA: (A,B,aA,aB)=>(A*B/255)*((aA+aB)/510),
+        divA: (A,B,aA,aB)=>B===0?0:(A/B)*((aA+aB)/510)
+      };
+      function compositeSourceOver(aPixel,bPixel){
+        const aA = aPixel.a/255;
+        const bA = bPixel.a/255;
+        const outA = aA + bA*(1-aA);
+        if(outA===0){
+          return {r:0,g:0,b:0,a:0};
         }
-        h=Math.round(h*60);
-        if(h<0) h+=360;
-        let s=max===0?0:d/max;
-        let v=max;
-        return {h,s,v};
+        const r = (aPixel.r*aA + bPixel.r*bA*(1-aA))/outA;
+        const g = (aPixel.g*aA + bPixel.g*bA*(1-aA))/outA;
+        const b = (aPixel.b*aA + bPixel.b*bA*(1-aA))/outA;
+        return {
+          r:clamp(r),
+          g:clamp(g),
+          b:clamp(b),
+          a:clamp(outA*255)
+        };
       }
       const result = [];
       for(let y=0;y<height;y++){
@@ -1036,12 +1077,25 @@
         for(let x=0;x<width;x++){
           const aPixel = hexToRgb(A.color[y][x]);
           const bPixel = hexToRgb(B.color[y][x]);
-          if (aPixel.a === 0 || bPixel.a === 0) {
-            row.push('#00000000');
-            continue
+          if(args.MENU==="alpha"){
+            const out = compositeSourceOver(aPixel,bPixel);
+            row.push(rgbToHex(out.r,out.g,out.b,out.a));
+            continue;
+         }
+         const fn = conversiontypes[args.MENU];
+          let r,g,b,a;
+          if(args.MENU.endsWith("A")){
+            r = fn(aPixel.r,bPixel.r,aPixel.a,bPixel.a);
+            g = fn(aPixel.g,bPixel.g,aPixel.a,bPixel.a);
+            b = fn(aPixel.b,bPixel.b,aPixel.a,bPixel.a);
+            a = Math.max(aPixel.a,bPixel.a);
+          }else{
+            r = fn(aPixel.r,bPixel.r);
+            g = fn(aPixel.g,bPixel.g);
+            b = fn(aPixel.b,bPixel.b);
+            a = fn(aPixel.a,bPixel.a);
           }
-          const pixel = rgbToHex((aPixel.r + bPixel.r) / 2, (aPixel.g + bPixel.g) / 2, (aPixel.b + bPixel.b) / 2, (aPixel.a + bPixel.a) / 2)
-          row.push(pixel);
+          row.push(rgbToHex(r,g,b,a));
         }
         result.push(row);
       }
@@ -1054,6 +1108,7 @@
       let bTotal = 0;
       let aTotal = 0;
       let count = 0;
+      if (args.IMAGE == undefined) return '#00000000'
       const matrix = args.IMAGE.color;
       matrix.forEach(row => {
         row.forEach(cell => {
@@ -1079,6 +1134,155 @@
         g.toString(16).padStart(2,"0") +
         b.toString(16).padStart(2,"0") +
         a.toString(16).padStart(2,"0");
+    }
+
+    hsvmix(args) {
+      const A = args.A;
+      const B = args.B;
+      if (A == undefined || B == undefined) return this.blankImage({X: 3, Y: 3})
+      const width = Math.min(A.x, B.x);
+      const height = Math.min(A.y, B.y);
+      function clamp(v){
+        return Math.max(0, Math.min(Math.round(v),255));
+      }
+      function hexToRgba(hex){
+        hex = hex.replace("#","");
+        return {
+          r: parseInt(hex.slice(0,2),16),
+          g: parseInt(hex.slice(2,4),16),
+          b: parseInt(hex.slice(4,6),16),
+          a: parseInt(hex.slice(6,8) || "ff",16)
+        };
+      }
+      function rgbaToHex(r,g,b,a){
+        return "#" +
+          clamp(r).toString(16).padStart(2,"0") +
+          clamp(g).toString(16).padStart(2,"0") +
+          clamp(b).toString(16).padStart(2,"0") +
+          clamp(a).toString(16).padStart(2,"0");
+      }
+      function rgbToHsv(r,g,b){
+        r/=255; g/=255; b/=255;
+        const max=Math.max(r,g,b);
+        const min=Math.min(r,g,b);
+        const d=max-min;
+        let h=0;
+        if(d!==0){
+          switch(max){
+            case r: h=((g-b)/d)%6; break;
+            case g: h=(b-r)/d+2; break;
+            case b: h=(r-g)/d+4; break;
+          }
+          h*=60;
+          if(h<0) h+=360;
+        }
+        const s = max===0 ? 0 : d/max;
+        const v = max;
+        return {h,s,v};
+      }
+      function hsvToRgb(h,s,v){
+        const c=v*s;
+        const x=c*(1-Math.abs((h/60)%2-1));
+        const m=v-c;
+        let r=0,g=0,b=0;
+        if(h<60){ r=c; g=x; }
+        else if(h<120){ r=x; g=c; }
+        else if(h<180){ g=c; b=x; }
+        else if(h<240){ g=x; b=c; }
+        else if(h<300){ r=x; b=c; }
+        else { r=c; b=x; }
+        return {
+          r:(r+m)*255,
+          g:(g+m)*255,
+          b:(b+m)*255
+        };
+      }
+      const blend = {
+        add:(a,b)=>a+b,
+        sub:(a,b)=>a-b,
+        mul:(a,b)=>a*b,
+        div:(a,b)=>b===0?0:a/b,
+        avg:(a,b)=>(a+b)/2
+      };
+      const result=[];
+      for(let y=0;y<height;y++){
+        const row=[];
+        for(let x=0;x<width;x++){
+          const pA = hexToRgba(A.color[y][x]);
+          const pB = hexToRgba(B.color[y][x]);
+          const hsvA = rgbToHsv(pA.r,pA.g,pA.b);
+          const hsvB = rgbToHsv(pB.r,pB.g,pB.b);
+          const fn = blend[args.MENU] || blend.avg;
+          const h = (fn(hsvA.h,hsvB.h)) % 360;
+          const s = Math.max(0,Math.min(fn(hsvA.s,hsvB.s),1));
+          const v = Math.max(0,Math.min(fn(hsvA.v,hsvB.v),1));
+          const rgb = hsvToRgb(h,s,v);
+          const a = fn(pA.a,pB.a);
+          row.push(rgbaToHex(rgb.r,rgb.g,rgb.b,a));
+        }
+        result.push(row);
+      }
+      return new Image(result,width,height);
+    }
+
+    lineargradient(args) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      const linear = ctx.createLinearGradient(0, 0, width, 0);
+      linear.addColorStop(0, args.A);
+      linear.addColorStop(1, args.B);
+      ctx.fillStyle = linear;
+      ctx.fillRect(0, 0, width, height);
+      const imageData = ctx.getImageData(0, 0, width, height).data;
+      const nestedHexArray = [];
+      for (let y = 0; y < height; y++) {
+        const row = [];
+        for (let x = 0; x < width; x++) {
+          const i = (y * width + x) * 4;
+          const r = imageData[i];
+          const g = imageData[i + 1];
+          const b = imageData[i + 2];
+          const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b)
+            .toString(16)
+            .slice(1)
+            .toUpperCase();
+          row.push(hex);
+        }
+        nestedHexArray.push(row);
+      }
+      return new Image(nestedHexArray, width, height);
+    }
+
+    circlegradient(args) {
+      const size = Math.max(1, Math.floor(args.R * 2));
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+      const cx = size / 2;
+      const cy = size / 2;
+      const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, args.R);
+      gradient.addColorStop(0, args.A);
+      gradient.addColorStop(1, args.B);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      const matrix = [];
+      for (let y = 0; y < canvas.height; y++) {
+        const row = [];
+        for (let x = 0; x < canvas.width; x++) {
+          const i = (y * canvas.width + x) * 4;
+          const r = imageData[i];
+          const g = imageData[i + 1];
+          const b = imageData[i + 2];
+          const a = imageData[i + 3];
+          row.push(rgbaToHex(r, g, b, a));
+        }
+        matrix.push(row);
+      }
+      return new Image(matrix, canvas.width, canvas.height);
     }
 
     github() {
