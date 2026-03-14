@@ -38,6 +38,9 @@ Blocks:
 - [Image Mixxing](#image-mixxing)
    - [`((A) HSV[MENU]Mix (B))`](#a-hsv-mix-b---image)
    - [`((A) RGB[MENU]Mix (B))`](#a-rgb-mix-b---image)
+- [Gradients](#gradients)
+   - [`(Linear Gradient That Goes From(A)To(B))`](#linear-gradient-that-goes-fromatob---image)
+   - [`(Circular Gradient That Goes From(A)To(B)With Radius(RADIUS))`](#circular-gradient-that-goes-fromatobwith-radiusradius---image)
 
 # Image Givers
 
@@ -191,3 +194,15 @@ Returns A Image Where It Gets All Pixels Of `(A)` And `(B)` And Executes The Fun
 ![no img?](Asset/Blocks/rgbmix.png)
 
 Returns A Image Where It Gets All Pixels Of `(A)` And `(B)` And Executes The Function In `[MENU]` To All Their Red, Green, And Blue
+
+# Gradients
+
+## `(Linear Gradient That Goes From(A)To(B))` -> Image
+![no img?](Asset/Blocks/lineargradient.png)
+
+Returns A Gradient That Goes From `(A)` To `(B)`
+
+## `(Circular Gradient That Goes From(A)To(B)With Radius(RADIUS))` -> Image
+![no img?](Asset/Blocks/circlegradient.png)
+
+Returns A Circular Gradient That Goes From `(A)` To `(B)` With A Radius Of `(RADIUS)`
