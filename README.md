@@ -2,6 +2,8 @@
 # Images
 A [Penguinmod](https://studio.penguinmod.com/editor.html) Extension That Lets You Create/Manipulate Images For Visual Stuff Idk Man
 
+And If You Are Interested On The Updates Then Follows The [Official Discord Thread](https://discord.com/channels/1033551490331197462/1476701126098157751)
+
 Blocks:
 - [Image Givers](#image-givers)
   - [`(Blank(X)x(Y)Image)`](#blankxxyimage---image)
