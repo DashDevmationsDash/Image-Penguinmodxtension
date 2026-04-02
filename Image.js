@@ -132,6 +132,14 @@
   }
 
   class ImagesExtension {
+    constructor() {
+      vm.runtime.registerSerializer('dvImage', (Image) => {
+        return JSON.stringify(Image.color);
+      }, (String) => {
+        const Matrix = JSON.parse(String);
+        return new Image(Matrix, Matrix[0].length, Matrix.length);
+      });
+    }
     getInfo() {
       return {
         id: 'dvImages',
