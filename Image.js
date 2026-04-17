@@ -117,7 +117,7 @@
     }
     static toImage(img) {
       if (img instanceof Image) return img
-      return new Image([], 0, 0)
+      return new Image([], 1, 1)
     }
   }
   const Template = {
