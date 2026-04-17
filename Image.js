@@ -115,6 +115,10 @@
       container.appendChild(img);
       return container.outerHTML;
     }
+    static toImage(img) {
+      if (img instanceof Image) return img
+      return new Image([], 0, 0)
+    }
   }
   const Template = {
     Block: {
@@ -128,11 +132,13 @@
       check: ['dvImage'],
       exemptFromNormalization: true
     },
-    Pause: "---"
+    Pause: "---",
+    Type: Image
   }
 
   class ImagesExtension {
     constructor() {
+      this.Type = Image;
       vm.runtime.registerSerializer('dvImage', (Image) => {
         return JSON.stringify(Image.color);
       }, (String) => {
@@ -558,21 +564,21 @@
       };
     }
 
-    blankImage(args) {
-      const width = Math.max(1, Math.floor(args.X));
-      const height = Math.max(1, Math.floor(args.Y));
+    blankImage({ X, Y }) {
+      const width = Math.max(1, Math.floor(X));
+      const height = Math.max(1, Math.floor(Y));
       const matrix = Array.from({ length: height }, () =>
         new Array(width).fill("#00000000")
       );
       return new Image(matrix, width, height);
     }
 
-    widthOf(args) {
-      return args.IMAGE?.x || 0;
+    widthOf({ IMAGE }) {
+      return Image.toImage(IMAGE).x
     }
 
-    heightOf(args) {
-      return args.IMAGE?.y || 0;
+    heightOf({ IMAGE }) {
+      return Image.toImage(IMAGE).y
     }
 
     async openCanvas() {
@@ -675,35 +681,35 @@
         };
       });
     }
-    dataurl(args) {
+    dataurl({ IMAGE }) {
       try {
-        return args.IMAGE.toCanvas().toDataURL();
+        return Image.toImage(IMAGE).toCanvas().toDataURL();
       } catch(e) {
         return ''
       }
     }
-    settextureof(args) {
-      if (args.TARGET === undefined || args.IMAGE === undefined) return
-      const Target = args.TARGET.target;
+    settextureof({ IMAGE, TARGET }) {
+      const Img = Image.toImage(IMAGE)
+      const Target = vm.jwTargets.Type.toTarget(TARGET).target;
       const Renderer = vm.renderer;
-      const skinId = Renderer.createBitmapSkin(args.IMAGE.toCanvas());
+      const skinId = Renderer.createBitmapSkin(Img.toCanvas());
       Renderer.updateDrawableProperties(Target.drawableID, {skinId: skinId});
-      textures[args.TARGET] = args.IMAGE
+      textures[Target] = Img
     }
-    async imgof(args, util) {
+    async imgof({ COSTUME }, util) {
       const Target = util.target;
       let Index;
-      if (args.COSTUME === 'next costume') {
+      if (COSTUME === 'next costume') {
         Index = (Target.currentCostume + 1) % Target.sprite.costumes.length;
-      } else if (args.COSTUME === 'previous costume') {
+      } else if (COSTUME === 'previous costume') {
         Index = (Target.currentCostume - 1 + Target.sprite.costumes.length) % Target.sprite.costumes.length;
-      } else if (args.COSTUME === 'random costume') {
+      } else if (COSTUME === 'random costume') {
         Index = Math.floor(Math.random() * Target.sprite.costumes.length);
-      } else if (typeof args.COSTUME == 'number') {
-        Index = (args.COSTUME - 1) % Target.sprite.costumes.length;
+      } else if (typeof COSTUME == 'number') {
+        Index = (COSTUME - 1) % Target.sprite.costumes.length;
       } else {
-        Index = Target.getCostumeIndexByName(args.COSTUME);
-        if (Index < 0) return this.blankImage({X: 3, Y:3})
+        Index = Target.getCostumeIndexByName(COSTUME);
+        if (Index < 0) return Image.toImage()
       }
       const Costume = Target.sprite.costumes[Index];
       const Img =  document.createElement('img');
@@ -731,11 +737,11 @@
       return new Image(Matrix, Img.width, Img.height);
     }
 
-    async fromdataurl(args) {
+    async fromdataurl({ URL }) {
       try {
         const Img = document.createElement('img');
         Img.crossOrigin = "anonymous";
-        Img.src = args.URL;
+        Img.src = URL;
         await new Promise((resolve, reject) => {
           Img.onload = resolve;
           Img.onerror = reject;
@@ -761,53 +767,49 @@
         }
         return new Image(Matrix, Canvas.width, Canvas.height);
       } catch(e) {
-        return this.blankImage({X: 3, Y: 3})
+        return Image.toImage()
       }
     }
 
-    getColorOfPixel(args) {
-      if (args.VECTOR == undefined) return '#00000000'
-      if (args.VECTOR.x == undefined) return '#00000000'
-      if (args.VECTOR.y == undefined) return '#00000000'
-      if (args.IMAGE == undefined) return '#00000000'
-      if (args.VECTOR.x > args.IMAGE.x) return '#00000000'
-      if (args.VECTOR.y > args.IMAGE.y) return '#00000000'
-      const x = Math.max(1, Math.floor(args.VECTOR.x));
-      const y = Math.max(1, Math.floor(args.VECTOR.y));
-      const Matrix = args.IMAGE.color;
+    getColorOfPixel({ IMAGE, VECTOR }) {
+      const v = vm.jwVector.Type.toVector(VECTOR)
+      const img = Image.toImage(IMAGE)
+      if (v.x > img.x) return '#00000000'
+      if (v.y > img.y) return '#00000000'
+      const x = Math.max(1, Math.floor(v.x));
+      const y = Math.max(1, Math.floor(v.y));
+      const Matrix = img.color;
       return Matrix[y - 1][x - 1];
     }
 
-    setColorOfPixel(args) {
-      if (args.VECTOR == undefined) return args.IMAGE;
-      if (args.VECTOR.x == undefined) return args.IMAGE;
-      if (args.VECTOR.y == undefined) return args.IMAGE;
-      if (args.IMAGE == undefined) return this.blankImage({X: 3, Y: 3});
-      if (args.VECTOR.x > args.IMAGE.x) return args.IMAGE;
-      if (args.VECTOR.y > args.IMAGE.y) return args.IMAGE;
-      const x = Math.max(1, Math.floor(args.VECTOR.x));
-      const y = Math.max(1, Math.floor(args.VECTOR.y));
-      const Matrix = args.IMAGE.color;
-      Matrix[y - 1][x - 1] = args.COLOR + "ff";
-      return new Image(Matrix, args.IMAGE.x, args.IMAGE.y);
+    setColorOfPixel({ VECTOR, IMAGE, COLOR}) {
+      const v = vm.jwVector.Type.toVector(VECTOR)
+      const img = Image.toImage(IMAGE)
+      if (v.x > img.x) return img;
+      if (v.y > img.y) return img;
+      const x = Math.max(1, Math.floor(v.x));
+      const y = Math.max(1, Math.floor(v.y));
+      const Matrix = img.color;
+      Matrix[y - 1][x - 1] = COLOR + "ff";
+      return new Image(Matrix, img.x,img.y);
     }
 
-    textureof(args) {
-      if (!this.isusingtexture(args) || args.TARGET == undefined) return this.blankImage({X: 3, Y: 3})
-      return textures[args.TARGET];
+    textureof({ TARGET }) {
+      const t = vm.jwTargets.Type.toTarget(TARGET).target;
+      if (!this.isusingtexture({ TARGET })) return Image.toImage();
+      return textures[t];
     }
 
-    removetextureof(args) {
-      if(!args.TARGET) return
-      const Target = args.TARGET.target;
+    removetextureof({ TARGET }) {
+      const Target = vm.jwTargets.Type.toTarget(TARGET).target;
       const Renderer = vm.renderer;
       Target.updateAllDrawableProperties();
-      if (!! this.isusingtexture(args)) delete textures[args.TARGET]
+      if (!! this.isusingtexture({TARGET: Target})) delete textures[Target]
     }
 
-    invert(args) {
-      if (args.IMAGE == undefined || args.IMAGE.customId != 'dvImage') return this.blankImage({X: 3,Y: 3})
-      const Matrix = args.IMAGE.color;
+    invert({ IMAGE }) {
+      const Img = Image.toImage(IMAGE)
+      const Matrix = Img.color;
       let Return = [];
       Matrix.forEach(row => {
         let newRow = [];
@@ -826,13 +828,13 @@
         });
         Return.push(newRow);
       });
-      return new Image(Return, args.IMAGE.x, args.IMAGE.y);
+      return new Image(Return, Img.x, Img.y);
     }
 
-    brighten(args) {
-      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
-      const Offset = Math.abs(Math.floor(args.OFFSET))
-      const Matrix = args.IMAGE.color;
+    brighten({ IMAGE, OFFSET }) {
+      const Offset = Math.abs(Math.floor(OFFSET))
+      const Img = Image.toImage(IMAGE)
+      const Matrix = Img.color;
       let Return = [];
       Matrix.forEach(row => {
         let newRow = [];
@@ -851,28 +853,25 @@
         });
         Return.push(newRow);
       });
-      return new Image(Return, args.IMAGE.x, args.IMAGE.y);
+      return new Image(Return, Img.x, Img.y);
     }
 
-    pixels(args) {
-      if (!args.IMAGE || !args.IMAGE.customId) return new vm.jwArray.Type([], false)
-      return new vm.jwArray.Type(args.IMAGE.color, false);
+    pixels({ IMAGE }) {
+      return new vm.jwArray.Type(Image.toImage(IMAGE).color, false);
     }
 
-    frompixels(args) {
-      const Array = args.PIXELS.array;
-      if (!args.PIXELS) return this.blankImage({X: 3,Y: 3})
-      for (let index = 0; index < Array.length; index++) {
-        const element = Array[index];
-        Array[index] = element.array;
+    frompixels({ PIXELS }) {
+      const a = vm.jwArray.Type.toArray(PIXELS.array);
+      for (let index = 0; index < a.length; index++) {
+        const element = a[index];
+        a[index] = element.array;
       }
-      return new Image(Array, Array[0].length, Array.length);
+      return new Image(a, a[0]?.length || 0, a.length);
     }
 
-    rotate(args) {
-      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
-      const srcCanvas = args.IMAGE.toCanvas();
-      const angle = args.ANGLE * (Math.PI / 180);
+    rotate({ IMAGE, ANGLE }) {
+      const srcCanvas = Image.toImage(IMAGE).toCanvas();
+      const angle = ANGLE * (Math.PI / 180);
       const sin = Math.abs(Math.sin(angle));
       const cos = Math.abs(Math.cos(angle));
       const newWidth = Math.ceil(srcCanvas.width * cos + srcCanvas.height * sin);
@@ -897,24 +896,24 @@
       return new Image(matrix, newWidth, newHeight);
     }
 
-    scale(args) {
-      if (!args.IMAGE || !args.IMAGE.customId || !args.VECTOR) return this.blankImage({X: 3,Y: 3})
-      const src = args.IMAGE.toCanvas()
+    scale({ IMAGE, VECTOR }) {
+      const img = Image.toImage(IMAGE)
+      const src = img.toCanvas()
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      const vector = args.VECTOR;
+      const vector = vm.jwVector.Type.toVector(VECTOR);
       vector.x = Math.max(1, vector.x);
       vector.y = Math.max(1, vector.y);
-      canvas.width = vector.x * args.IMAGE.x;
-      canvas.height = vector.y * args.IMAGE.y;
+      canvas.width = vector.x * img.x;
+      canvas.height = vector.y * img.y;
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(src, 0, 0, vector.x * args.IMAGE.x, vector.y * args.IMAGE.y);
-      const data = ctx.getImageData(0, 0, vector.x * args.IMAGE.x, vector.y * args.IMAGE.y).data;
+      ctx.drawImage(src, 0, 0, vector.x * img.x, vector.y * img.y);
+      const data = ctx.getImageData(0, 0, vector.x * img.x, vector.y * img.y).data;
       const matrix = [];
-      for (let y = 0; y < vector.y * args.IMAGE.y; y++) {
+      for (let y = 0; y < vector.y * img.y; y++) {
         const row = [];
-        for (let x = 0; x < vector.x * args.IMAGE.x; x++) {
-          const i = (y * vector.x * args.IMAGE.x + x) * 4;
+        for (let x = 0; x < vector.x * img.x; x++) {
+          const i = (y * vector.x * img.x + x) * 4;
           row.push(rgbaToHex(data[i], data[i+1], data[i+2], data[i+3]));
         }
         matrix.push(row);
@@ -922,9 +921,9 @@
       return new Image(matrix, canvas.width, canvas.height);
     }
 
-    transparency(args) {
-      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
-      const Matrix = args.IMAGE.color;
+    transparency({ IMAGE, OFFSET }) {
+      const img = Image.toImage(IMAGE)
+      const Matrix = img.color;
       let Return = [];
       Matrix.forEach(row => {
         let newRow = [];
@@ -936,26 +935,25 @@
           const r = parseInt(cell.slice(1, 3), 16);
           const g = parseInt(cell.slice(3, 5), 16);
           const b = parseInt(cell.slice(5, 7), 16);
-          const a = Math.max(0, Math.min(255, parseInt(cell.slice(7, 9), 16) - args.OFFSET));
+          const a = Math.max(0, Math.min(255, parseInt(cell.slice(7, 9), 16) - OFFSET));
           newRow.push(
             `#${r.toString(16).padStart(2,"0")}${g.toString(16).padStart(2,"0")}${b.toString(16).padStart(2,"0")}${a.toString(16).padStart(2,"0")}`
           );
         });
         Return.push(newRow);
       });
-      return new Image(Return, args.IMAGE.x, args.IMAGE.y);
+      return new Image(Return, img.x, img.y);
     }
 
-    tint(args) {
-      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
-      const srcCanvas = args.IMAGE?.toCanvas() || document.createElement('canvas');
+    tint({ IMAGE, COLOR }) {
+      const srcCanvas = Image.toImage(IMAGE).toCanvas()
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       canvas.width = srcCanvas.width;
       canvas.height = srcCanvas.height;
       ctx.drawImage(srcCanvas, 0, 0);
       ctx.globalCompositeOperation = "source-atop";
-      ctx.fillStyle = args.COLOR;
+      ctx.fillStyle = COLOR;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.globalCompositeOperation = "source-over";
       const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
@@ -971,15 +969,14 @@
       return new Image(matrix, canvas.width, canvas.height);
     }
 
-    isusingtexture(args) {
-      return !!(textures[args.TARGET] || false)
+    isusingtexture({ TARGET }) {
+      return !!(textures[vm.jwTargets.Type.toTarget(TARGET).target] || false)
     }
     
-    crop(args) {
-      if (!args.IMAGE || !args.IMAGE.customId) return this.blankImage({X: 3,Y: 3})
-      const image = args.IMAGE.color;
-      const v1 = args.V1;
-      const v2 = args.V2;
+    crop({ IMAGE, V1, V2 }) {
+      const image = Image.toImage(IMAGE).color;
+      const v1 = vm.jwVector.Type.toVector(V1);
+      const v2 = vm.jwVector.Type.toVector(V2);
       const x1 = Math.max(0, Math.floor(Math.min(v1.x, v2.x)) - 1);
       const y1 = Math.max(0, Math.floor(Math.min(v1.y, v2.y)) - 1);
       const x2 = Math.floor(Math.max(v1.x, v2.x)) - 1;
@@ -997,9 +994,8 @@
       return new Image(result, newWidth, newHeight);
     }
 
-    async costumesof(args) {
-      if (args.TARGET == undefined) return new vm.jwArray.Type([], false);
-      const target = args.TARGET.target;
+    async costumesof({ TARGET }) {
+      const target = vm.jwTargets.Type.toTarget(TARGET).target;
       const costumes = target.sprite.costumes;
       const images = [];
       for (const element of costumes) {
@@ -1008,28 +1004,27 @@
       return new vm.jwArray.Type(images, false);
     }
 
-    horizontalyflip(args) {
-      if (args.IMAGE == undefined) return this.blankImage({X: 3, Y: 3})
-      const matrix = args.IMAGE.color;
+    horizontalyflip({ IMAGE }) {
+      const img = Image.toImage(IMAGE)
+      const matrix = img.color;
       let retrun = [];
       matrix.forEach(element => {
         retrun.push(element.reverse());
       });
-      return new Image(retrun, args.IMAGE.x, args.IMAGE.y);
+      return new Image(retrun, img.x, img.y);
     }
 
-    verticalflip(args) {
-      if (args.IMAGE == undefined) return this.blankImage({X: 3, Y: 3})
-      let matrix = args.IMAGE.color;
+    verticalflip({ IMAGE }) {
+      const img = Image.toImage(IMAGE)
+      let matrix = img.color;
       matrix.color = matrix.reverse();
-      return matrix;
+      return new Image(matrix, img.x, img.y);
     }
 
 
-    rgbmix(args) {
-      const A = args.A;
-      const B = args.B;
-      if (A == undefined || B == undefined) return this.blankImage({X: 3, Y: 3});
+    rgbmix({A, B, MENU}) {
+      A = Image.toImage(A);
+      B = Image.toImage(B)
       const width = Math.min(A.x, B.x);
       const height = Math.min(A.y, B.y);
       function clamp(v) {
@@ -1085,14 +1080,14 @@
         for(let x=0;x<width;x++){
           const aPixel = hexToRgb(A.color[y][x]);
           const bPixel = hexToRgb(B.color[y][x]);
-          if(args.MENU==="alpha"){
+          if(MENU==="alpha"){
             const out = compositeSourceOver(aPixel,bPixel);
             row.push(rgbToHex(out.r,out.g,out.b,out.a));
             continue;
          }
-         const fn = conversiontypes[args.MENU];
+         const fn = conversiontypes[MENU];
           let r,g,b,a;
-          if(args.MENU.endsWith("A")){
+          if(MENU.endsWith("A")){
             r = fn(aPixel.r,bPixel.r,aPixel.a,bPixel.a);
             g = fn(aPixel.g,bPixel.g,aPixel.a,bPixel.a);
             b = fn(aPixel.b,bPixel.b,aPixel.a,bPixel.a);
@@ -1110,14 +1105,13 @@
       return new Image(result,width,height);
     }
 
-    averagepixelcolor(args) {
+    averagepixelcolor({ IMAGE }) {
       let rTotal = 0;
       let gTotal = 0;
       let bTotal = 0;
       let aTotal = 0;
       let count = 0;
-      if (args.IMAGE == undefined) return '#00000000'
-      const matrix = args.IMAGE.color;
+      const matrix = Image.toImage(IMAGE).color;
       matrix.forEach(row => {
         row.forEach(cell => {
           if (!cell || cell.length < 9) return;
@@ -1132,7 +1126,6 @@
           count++;
         });
       });
-      if (count === 0) return "#00000000";
       const r = Math.round(rTotal / count);
       const g = Math.round(gTotal / count);
       const b = Math.round(bTotal / count);
@@ -1144,10 +1137,9 @@
         a.toString(16).padStart(2,"0");
     }
 
-    hsvmix(args) {
-      const A = args.A;
-      const B = args.B;
-      if (A == undefined || B == undefined) return this.blankImage({X: 3, Y: 3})
+    hsvmix({ A, B, MENU }) {
+      A = Image.toImage(A)
+      B = Image.toImage(B)
       const width = Math.min(A.x, B.x);
       const height = Math.min(A.y, B.y);
       function clamp(v){
@@ -1220,7 +1212,7 @@
           const pB = hexToRgba(B.color[y][x]);
           const hsvA = rgbToHsv(pA.r,pA.g,pA.b);
           const hsvB = rgbToHsv(pB.r,pB.g,pB.b);
-          const fn = blend[args.MENU] || blend.avg;
+          const fn = blend[MENU] || blend.avg;
           const h = (fn(hsvA.h,hsvB.h)) % 360;
           const s = Math.max(0,Math.min(fn(hsvA.s,hsvB.s),1));
           const v = Math.max(0,Math.min(fn(hsvA.v,hsvB.v),1));
@@ -1233,14 +1225,14 @@
       return new Image(result,width,height);
     }
 
-    lineargradient(args) {
+    lineargradient({ A, B }) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const width = canvas.width;
       const height = canvas.height;
       const linear = ctx.createLinearGradient(0, 0, width, 0);
-      linear.addColorStop(0, args.A);
-      linear.addColorStop(1, args.B);
+      linear.addColorStop(0, A);
+      linear.addColorStop(1, B);
       ctx.fillStyle = linear;
       ctx.fillRect(0, 0, width, height);
       const imageData = ctx.getImageData(0, 0, width, height).data;
@@ -1263,17 +1255,17 @@
       return new Image(nestedHexArray, width, height);
     }
 
-    circlegradient(args) {
-      const size = Math.max(1, Math.floor(args.R * 2));
+    circlegradient({A, B, R}) {
+      const size = Math.max(1, Math.floor(R * 2));
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = size;
       canvas.height = size;
       const cx = size / 2;
       const cy = size / 2;
-      const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, args.R);
-      gradient.addColorStop(0, args.A);
-      gradient.addColorStop(1, args.B);
+      const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+      gradient.addColorStop(0, A);
+      gradient.addColorStop(1, B);
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
@@ -1300,4 +1292,4 @@
 
   Scratch.extensions.register(new ImagesExtension());
 
-})(Scratch);
+})(Scratch);v
